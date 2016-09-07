@@ -113,8 +113,7 @@ class WaveformDeformator:
             ctypes.c_void_p(self.T_hhg.ctypes.data),
             ctypes.c_void_p(E_hhg.ctypes.data),
             self.gas_c_dict[gas],
-            ctypes.c_void_p(X.ctypes.data),
-            ctypes.c_double(self.gas_ip_dict[gas]))
+            ctypes.c_void_p(X.ctypes.data))
         X_spec = np.append(np.fft.fft(X)[:int(self.tnum_hhg/2)], j*np.zeros(int(self.tnum_hhg/2)))
         X_spec *= np.exp(-Beta_hhg*2*np.pi/(1240/self.Ev_hhg*10**(-9))*(self.zrange-z)*p_g)*p_g
         self.X_hhg += np.fft.ifft(X_spec)

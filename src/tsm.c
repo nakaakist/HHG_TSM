@@ -5,7 +5,7 @@ double ADK(double E, double Cnl, double Glm, double Ip, double F0, double n, int
   return Cnl*Cnl*Glm*Ip*pow(2*F0/fabs(E), 2*n-abs(m)-1)*exp(-2*F0/(3*fabs(E)));
 }
 
-void tsm(int N, void* T_v, void* E_v, int gas, void* X_v, double ip){
+void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
   double* T = (double*)T_v;
   double* E = (double*)E_v;
   double* X = (double*)X_v;
@@ -13,6 +13,7 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v, double ip){
   double A[N];
   double Aint[N];
   double A2int[N];
+  double ip;
 
   double dt = (T[N-1]-T[0])/N;
 
@@ -21,16 +22,19 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v, double ip){
   case 1:
     for(int i=0; i<N; i++){
       W[i] = ADK(E[i], 2.05999, 3, 21.56/27.21, 1.99547, 0.7943, 0);
+      ip = 21.56/27.21;
     }
     break;
   case 2:
     for(int i=0; i<N; i++){
       W[i] = ADK(E[i], 2.02870, 3, 15.85/27.21, 1.24665, 0.92915, 0);
+      ip = 15.85/27.21;
     }
     break;
   case 3:
     for(int i=0; i<N; i++){
       W[i] = ADK(E[i], 2.00636, 3, 14.35/27.21, 1.04375, 0.98583, 0);
+      ip = 14.35/27.21;
     }
     break;
   }
