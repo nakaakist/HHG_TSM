@@ -115,7 +115,7 @@ class WaveformDeformator:
             self.gas_c_dict[gas],
             ctypes.c_void_p(X.ctypes.data))
         X_spec = np.append(np.fft.fft(X)[:int(self.tnum_hhg/2)], j*np.zeros(int(self.tnum_hhg/2)))
-        X_spec *= np.exp(-Beta_hhg*2*np.pi/(1240/self.Ev_hhg*10**(-9))*(self.zrange-z)*p_g)*p_g
+        X_spec *= np.exp(-Beta_hhg*2*np.pi/(1240/self.Ev_hhg*10**(-9))*(self.zrange-z)*p_g)*p_g*(self.zrange/self.znum)
         self.X_hhg += np.fft.ifft(X_spec)
 
     self.Etz = np.array(self.Etz)
