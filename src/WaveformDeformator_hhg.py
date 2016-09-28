@@ -164,7 +164,7 @@ class WaveformDeformator:
         N_kerr = self.__n_kerr(p_g, E[:, i], 27.8*10**(-24)) #Kr
       W_plasma_square = self.__w_plasma_square(p_g, P)
       tau_i = int((np.pi/self.w0)/self.dt)
-      W_plasma_square = pd.rolling_mean(W_plasma_square, tau_i, center=True, axis=0)
+      W_plasma_square = np.array(pd.Series(W_plasma_square).rolling(window=tau_i, center=True).mean())
       W_plasma_square[-int(tau_i/2):] = np.nanmin(W_plasma_square)
       W_plasma_square[:int(tau_i/2)] = 0
       W_plasma_square = W_plasma_square/(1+np.exp((self.T-self.T.max()+2*np.pi/self.w0)*self.w0))
