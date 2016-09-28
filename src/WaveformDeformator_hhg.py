@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy import linalg, interpolate
 import ctypes
+import multiprocessing as mp
 
 tsmlib = ctypes.cdll.LoadLibrary('%s/tsm.so' % os.path.dirname(__file__))
 tsm = tsmlib.tsm
@@ -52,9 +53,9 @@ class WaveformDeformator:
     self.gas_c_dict = {'Ne': 1, 'Ar': 2, 'Kr': 3}
     self.gas_ip_dict = {'Ne': 21.56*ev, 'Ar': 15.85*ev, 'Kr': 14.35*ev}
 
-    self.__calc_initial_field()
-
   def propagate(self, nonlinear=True, gas='Ar', p_g=1, neutral_disp=True, wmax=2*np.pi*2*10**15, hhg=True):
+
+    self.__calc_initial_field()
     l = 1
     u = 1
     ab = j*np.zeros((l+u+1, self.rnum-1))
@@ -184,3 +185,50 @@ class WaveformDeformator:
 
   def __n_kerr(self, p_g, E, n2):
     return p_g*np.abs(E)**2*(3.51*10**(20))*n2
+
+def unwrap_self_subcalc(arg, **kwarg):
+  # メソッドfをクラスメソッドとして呼び出す関数
+  return CEPScanner.subcalc(*arg, **kwarg)
+
+class CEPScanner:
+
+  def __init__(self, rmax=400*um, rnum=300, r0_beam=100*um, zrange=6000*um,
+               f=4000*um, znum=400, tmax=25*fs_si, tnum=1000, l0=1.6*um,
+               emax=280*mv_per_cm, e_fwhm=10*fs_si, wmax=2*np.pi*2*10**15, tnum_hhg=5000,
+               nonlinear=True, gas='Ar', p_g=1, neutral_disp=True, hhg=True, CEPs=np.linspace(0, 1, 10)):
+    self.rmax = rmax
+    self.rnum = rnum
+    self.r0_beam = r0_beam
+    self.zrange = zrange
+    self.f = f
+    self.znum = znum
+    self.tmax = tmax
+    self.tnum = tnum
+    self.l0 = l0
+    self.emax = emax
+    self.e_fwhm = e_fwhm
+    self.wmax = wmax
+    self.tnum_hhg = tnum_hhg
+    self.nonlinear = nonlinear
+    self.gas = gas
+    self.p_g = p_g
+    self.neutral_disp = neutral_disp
+    self.hhg = hhg
+    self.CEPs = CEPs
+    self.deformator = WaveformDeformator(rmax=self.rmax, rnum=self.rnum, r0_beam=self.r0_beam, zrange=self.zrange,
+                                      f=self.f, znum=self.znum, tmax=self.tmax, tnum=self.tnum, l0=self.l0,
+                                      emax=self.emax, e_fwhm=self.e_fwhm, wmax=self.wmax, tnum_hhg=self.tnum_hhg, cep=0*np.pi)
+
+  def check_convergence(self):
+    self.deformator.propagate(nonlinear=self.nonlinear, gas=self.gas, p_g=self.p_g, neutral_disp=self.neutral_disp, wmax=self.wmax, hhg=False)
+
+  def subcalc(self, cep):
+    deformator = WaveformDeformator(rmax=self.rmax, rnum=self.rnum, r0_beam=self.r0_beam, zrange=self.zrange,
+                                    f=self.f, znum=self.znum, tmax=self.tmax, tnum=self.tnum, l0=self.l0,
+                                    emax=self.emax, e_fwhm=self.e_fwhm, wmax=self.wmax, tnum_hhg=self.tnum_hhg, cep=cep*np.pi)
+    deformator.propagate(nonlinear=self.nonlinear, gas=self.gas, p_g=self.p_g, neutral_disp=self.neutral_disp, wmax=self.wmax, hhg=self.hhg)
+    return deformator.X_hhg
+
+  def propagate_CEP(self):
+    pool = mp.Pool(len(self.CEPs))
+    self.X_hhgs = pool.map(unwrap_self_subcalc, zip([self]*len(self.CEPs), self.CEPs))
