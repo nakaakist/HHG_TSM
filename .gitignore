@@ -1,6 +1,5 @@
 bin/*
 tmp/*
 *pyc
-*.dat
 *.so
 __pychache__
