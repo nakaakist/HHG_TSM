@@ -229,6 +229,10 @@ class CEPScanner:
     deformator.propagate(nonlinear=self.nonlinear, gas=self.gas, p_g=self.p_g, neutral_disp=self.neutral_disp, wmax=self.wmax, hhg=self.hhg)
     return deformator.X_hhg
 
-  def propagate_CEP(self):
-    pool = mp.Pool(len(self.CEPs))
+  def propagate_CEP(self, max_processes=None):
+    if max_ processes:
+      processes = min(len(self.CEPs), max_processes)
+    else:
+      processes = len(self.CEPs)
+    pool = mp.Pool(processes)
     self.X_hhgs = pool.map(unwrap_self_subcalc, zip([self]*len(self.CEPs), self.CEPs))
