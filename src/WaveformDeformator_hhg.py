@@ -60,9 +60,10 @@ class WaveformDeformator:
     u = 1
     ab = j*np.zeros((l+u+1, self.rnum-1))
 
-    ref_data = pd.read_csv('%s/constants/%s_refractive_indices.dat' % (os.path.dirname(__file__), gas), skiprows=10, delimiter='\t', names=['energy', 'd', 'b'])
-    f_beta = interpolate.interp1d(ref_data.energy, ref_data.b, kind='cubic')
-    Beta_hhg = f_beta(np.clip(self.Ev_hhg, 40, 500))
+    if hhg:
+      ref_data = pd.read_csv('%s/constants/%s_refractive_indices.dat' % (os.path.dirname(__file__), gas), skiprows=10, delimiter='\t', names=['energy', 'd', 'b'])
+      f_beta = interpolate.interp1d(ref_data.energy, ref_data.b, kind='cubic')
+      Beta_hhg = f_beta(np.clip(self.Ev_hhg, 40, 500))
 
     self.Etz = []
     self.Erz = []
