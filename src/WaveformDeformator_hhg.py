@@ -158,6 +158,10 @@ class WaveformDeformator:
         P = 1-np.exp(-self.__ADK(E[:, i].real, 2.02870, 3, 15.85*ev, 1.24665, 0.92915, 0).cumsum()*self.dt_atomic) #Ar
         N_gas = self.__n_gas(p_g, P, 8*ev, self.w0_atomic) #Ar
         N_kerr = self.__n_kerr(p_g, E[:, i], 9.8*10**(-24)) #Ar
+      elif gas == 'N2':
+        P = 1-np.exp(-0.4*self.__ADK(E[:, i].real, 2.02870, 3, 15.85*ev, 1.24665, 0.92915, 0).cumsum()*self.dt_atomic) #N2
+        N_gas = (0.0002953/0.0002789)*self.__n_gas(p_g, P, 8*ev, self.w0_atomic) #N2
+        N_kerr = self.__n_kerr(p_g, E[:, i], 8*10**(-24)) #N2
       elif gas == 'Kr':
         P = 1-np.exp(-self.__ADK(E[:, i].real, 2.00636, 3, 14.35*ev, 1.04375, 0.98583, 0).cumsum()*self.dt_atomic) #Kr
         N_gas = self.__n_gas(p_g, P, 6.5*ev, self.w0_atomic) #Kr
