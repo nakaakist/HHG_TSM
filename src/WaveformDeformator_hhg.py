@@ -50,8 +50,8 @@ class WaveformDeformator:
     self.dt_hhg = self.dt*tnum/tnum_hhg
     self.Omega_hhg = np.linspace(0, 2*np.pi/self.dt_hhg, tnum_hhg)
     self.Ev_hhg = 1.24/(2*np.pi*c)*self.Omega_hhg*um
-    self.gas_c_dict = {'Ne': 1, 'Ar': 2, 'Kr': 3}
-    self.gas_ip_dict = {'Ne': 21.56*ev, 'Ar': 15.85*ev, 'Kr': 14.35*ev}
+    self.gas_c_dict = {'He': 0, 'Ne': 1, 'Ar': 2, 'Kr': 3}
+    self.gas_ip_dict = {'He': 24.587*ev, 'Ne': 21.56*ev, 'Ar': 15.85*ev, 'Kr': 14.35*ev}
 
   def propagate(self, nonlinear=True, gas='Ar', p_g=1, neutral_disp=True, wmax=2*np.pi*2*10**15, hhg=True):
 
@@ -63,7 +63,10 @@ class WaveformDeformator:
     if hhg:
       ref_data = pd.read_csv('%s/constants/%s_refractive_indices.dat' % (os.path.dirname(__file__), gas), skiprows=10, delimiter='\t', names=['energy', 'd', 'b'])
       f_beta = interpolate.interp1d(ref_data.energy, ref_data.b, kind='cubic')
-      Beta_hhg = f_beta(np.clip(self.Ev_hhg, 40, 500))
+      if gas == 'He':
+        Beta_hhg = f_beta(np.clip(self.Ev_hhg, 40, 999))
+      else:
+        Beta_hhg = f_beta(np.clip(self.Ev_hhg, 40, 500))
 
     self.Etz = []
     self.Erz = []
@@ -151,9 +154,13 @@ class WaveformDeformator:
   def __calc_source_term(self, Ew, gas, neutral_disp, p_g):
     E = np.fft.ifft(Ew, axis=0)
     for i, r in enumerate(self.R):
+      if gas == 'He':
+        P = (1-np.exp(-self.__ADK(E[:, i].real, 2.06295, 1, 24.587*ev, 2.42946, 0.74387, 0).cumsum()*self.dt_atomic)) #He
+        N_gas = self.__n_gas(p_g, P, 21.9*ev, self.w0_atomic) #He
+        N_kerr = self.__n_kerr(p_g, E[:, i], 0.4*10**(-24)) #He
       if gas == 'Ne':
         P = (1-np.exp(-self.__ADK(E[:, i].real, 2.05999, 3, 21.56*ev, 1.99547, 0.7943, 0).cumsum()*self.dt_atomic)) #Ne
-        N_gas = self.__n_gas(p_g, P, 16.3*ev, self.w0_atomic)-self.__n_gas(p_g, 1, 8*ev, self.w0_atomic) #Ne
+        N_gas = self.__n_gas(p_g, P, 16.3*ev, self.w0_atomic) #Ne
         N_kerr = self.__n_kerr(p_g, E[:, i], 1.31*10**(-24)) #Ne
       elif gas == 'Ar':
         P = 1-np.exp(-self.__ADK(E[:, i].real, 2.02870, 3, 15.85*ev, 1.24665, 0.92915, 0).cumsum()*self.dt_atomic) #Ar

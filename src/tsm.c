@@ -17,8 +17,14 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
 
   double dt = (T[N-1]-T[0])/N;
 
-  //gas: 1:neon, 2:argon, 3:krypton
+  //gas: 0: helium, 1:neon, 2:argon, 3:krypton
   switch(gas){
+  case 0:
+    for(int i=0; i<N; i++){
+      W[i] = ADK(E[i], 2.06295, 1, 24.587/27.21, 2.42946, 0.74387, 0);
+      ip = 24.587/27.21;
+    }
+    break;
   case 1:
     for(int i=0; i<N; i++){
       W[i] = ADK(E[i], 2.05999, 3, 21.56/27.21, 1.99547, 0.7943, 0);
