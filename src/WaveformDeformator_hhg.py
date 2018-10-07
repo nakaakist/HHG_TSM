@@ -128,7 +128,7 @@ class WaveformDeformator:
     self.E = np.array(E)
     self.Pz = np.array(self.Pz)
     if not nonlinear:
-      emax_correction = self.emax/(np.abs(self.Etz).max())
+      emax_correction = 1 # if needed, replace 1 with self.emax/(np.abs(self.Etz).max())
       self.E0 = self.E0*emax_correction
       self.Etz_linear = np.array(self.Etz)*emax_correction
       self.Erz_linear = np.array(self.Erz)*emax_correction**2
