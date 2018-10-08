@@ -60,9 +60,10 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
   double x_diff1;
   double x_diff2;
   int icnt;
-  double t, e, a, aint, a2int, w, pst, sst;
+  double t, e, a, aint, a2int, w, pst, sst, tau, spread_factor;
   double x;
-  int num_traj = 1;
+  double laser_period = 6*1000.0/24.4;
+  int num_traj = 3;
   int I_cross[num_traj];
   double I_resid[num_traj];
 
@@ -93,7 +94,10 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
       w = W[I_cross[j]]+(W[I_cross[j]+1]-W[I_cross[j]])*I_resid[j];
       pst = (Aint[i]-aint)/(T[i]-t);
       sst = (0.5*pst*pst+ip)*(T[i]-t) - pst*(Aint[i]-aint) + (A2int[i]-a2int)*0.5;
-      x += pow(1.0/(T[i]-t), 1.5)*
+      tau = T[i]-t;
+      spread_factor = 1.0/(1.0+exp(0.1*(tau-laser_period)));
+      x += pow(1.0/tau, 1.5)*
+	   spread_factor*
 	   cos(sst)*
 	   (pst-A[i])/pow(pow(pst-A[i], 2)+2*ip, 3)*
 	   sqrt(w)/fabs(e);
