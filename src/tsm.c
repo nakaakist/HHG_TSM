@@ -70,7 +70,7 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
 
     icnt = 0;
     x_diff1 = 0;
-    for(int j=10; j<i; j++){
+    for(int j=100; j<i; j++){
       x_diff2 = (Aint[i]-Aint[i-j])/(T[i]-T[i-j])-A[i-j];
       if((x_diff1*x_diff2) < 0){
 	I_cross[icnt] = i-j;
