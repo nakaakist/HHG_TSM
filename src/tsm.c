@@ -62,7 +62,7 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
   int icnt;
   double t, e, a, aint, a2int, w, pst, sst;
   double x;
-  int num_traj = 5;
+  int num_traj = 1;
   int I_cross[num_traj];
   double I_resid[num_traj];
 
@@ -93,7 +93,7 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
       w = W[I_cross[j]]+(W[I_cross[j]+1]-W[I_cross[j]])*I_resid[j];
       pst = (Aint[i]-aint)/(T[i]-t);
       sst = (0.5*pst*pst+ip)*(T[i]-t) - pst*(Aint[i]-aint) + (A2int[i]-a2int)*0.5;
-      x += pow(1/(T[i]-t), 1.5)*
+      x += pow(1.0/(T[i]-t), 1.5)*
 	   cos(sst)*
 	   (pst-A[i])/pow(pow(pst-A[i], 2)+2*ip, 3)*
 	   sqrt(w)/fabs(e);
