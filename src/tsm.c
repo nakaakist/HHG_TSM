@@ -62,7 +62,7 @@ void tsm(int N, void* T_v, void* E_v, int gas, void* X_v){
   int icnt;
   double t, e, a, aint, a2int, w, pst, sst;
   double x;
-  int num_traj = 10;
+  int num_traj = 5;
   int I_cross[num_traj];
   double I_resid[num_traj];
 
